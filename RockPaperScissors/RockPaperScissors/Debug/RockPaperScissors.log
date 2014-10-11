@@ -1,0 +1,15 @@
+﻿Compilación iniciada a las 11/10/2014 22:25:22.
+     1>Proyecto "C:\Users\sergio ruiz\Documents\Visual Studio 2013\Projects\RockPaperScissors\RockPaperScissors\RockPaperScissors.vcxproj" en el nodo 2 (Build destinos).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt rockpaperscissors.cc
+         rockpaperscissors.cc
+     1>c:\users\sergio ruiz\documents\visual studio 2013\projects\rockpaperscissors\rockpaperscissors\rockpaperscissors.cc(104): warning C4244: 'argumento' : conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+     1>c:\users\sergio ruiz\documents\visual studio 2013\projects\rockpaperscissors\rockpaperscissors\rockpaperscissors.cc(188): warning C4715: 'PlayerInput' : no todas las rutas de acceso de control devuelven un valor
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\sergio ruiz\Documents\Visual Studio 2013\Projects\RockPaperScissors\Debug\RockPaperScissors.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\sergio ruiz\Documents\Visual Studio 2013\Projects\RockPaperScissors\Debug\RockPaperScissors.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\sergio ruiz\Documents\Visual Studio 2013\Projects\RockPaperScissors\Debug\RockPaperScissors.lib" /MACHINE:X86 Debug\rockpaperscissors.obj
+         RockPaperScissors.vcxproj -> C:\Users\sergio ruiz\Documents\Visual Studio 2013\Projects\RockPaperScissors\Debug\RockPaperScissors.exe
+     1>Compilación del proyecto terminada "C:\Users\sergio ruiz\Documents\Visual Studio 2013\Projects\RockPaperScissors\RockPaperScissors\RockPaperScissors.vcxproj" (Build destinos).
+
+Compilación correcta.
+
+Tiempo transcurrido 00:00:00.79
