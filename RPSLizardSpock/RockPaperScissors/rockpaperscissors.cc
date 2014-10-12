@@ -6,7 +6,7 @@
 */
 #define _CRT_SECURE_NO_DEPRECATE
 
-#include "rpslk.h"
+#include "rockpaperscissors.h"
 
 #include <stdio.h>
 #include <conio.h>
