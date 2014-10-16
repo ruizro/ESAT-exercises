@@ -1,10 +1,10 @@
 /**ROCK-PAPER-SCISSORS-LIZARD-SPOCK GAME
           by Sergio Ruiz Roig
-              Version 1.0.
+              Version 1.1.
 
   -> Work in progress
 */
-#define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "rockpaperscissors.h"
 
@@ -15,20 +15,22 @@
 #include <time.h>
 
 ///@brief Structure of an RPS player
-struct Player{
-  char name[30];
+struct Player {
+  char name[kStringWidth];
   int move;
   Player *next_player;
 };
 
-///@brief Number of moves possible in RPS-game
-const int kNumberMoves = 5;
-
-///@brief Maximum number of states that'll be involved in RPS-game
-const int kNumberStates = 50;
-
-///@brief Number of the match's states
-int list_states[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+///@brief Shows the game's logo
+void GameLogo() {
+  printf("--------------------------------------\n");
+  printf(" Alex Kidd & Sheldon Cooper presents: \n");
+  printf("   ROCK-PAPER-SCISSORS-LIZARD-SPOCK   \n");
+  printf("--------------------------------------\n");
+  printf("         by Sergio Ruiz Roig          \n");
+  printf("\nPush any button to start the game.\n");
+  _getch();
+}
 
 /**@brief Gives a name for the human player
 
@@ -37,7 +39,7 @@ int list_states[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
   @return human Player's name
   @param human Player's structure
-*/
+//*/
 struct Player InputName(Player human) {
   while (strlen(human.name) == 0) {
     printf("Give yourself a name: ");
@@ -56,9 +58,11 @@ struct Player InputName(Player human) {
   @return bool Boolean value
   @param sequence[10] Array with 10 values
   @param num_state Number we want to search
+  @param num_opponents Total of players
 */
-bool StateExists(int sequence[10], int num_state) {
-  for (int j = 0; j < 10; ++j) {
+bool StateExists(int sequence[kNumberOpponents], int num_state,
+                 int num_opponents) {
+  for (int j = 0; j < num_opponents; ++j) {
     if (sequence[j] == num_state) {
       return true;
     }
@@ -73,14 +77,14 @@ bool StateExists(int sequence[10], int num_state) {
 
   @return bool Boolean value
 */
-bool FileExists() {
-  ///@brief File with USA's states
-  FILE *usa = fopen("states.txt", "r");
+bool FileExists(const char* file_name) {
+  ///@brief File we want to know if exists
+  FILE *file = fopen(file_name, "r");
 
-  if (usa == NULL) {
+  if (file == NULL) {
     return false;
   } else {
-    fclose(usa);
+    fclose(file);
     return true;
   }
 }
@@ -102,11 +106,11 @@ void GetComputerStates() {
   bool state_found = false;
 
   srand(time(NULL));
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < kNumberOpponents; ++i) {
     state_found = true;
     while (state_found) {
-      random_number = rand() % kNumberStates + 1;
-      if (!StateExists(list_states, random_number)) {
+      random_number = rand() % kNumberStates;
+      if (!StateExists(list_states, random_number, kStringWidth)) {
         list_states[i] = random_number;
         state_found = false;
       }
@@ -132,20 +136,20 @@ struct Player* GetMatchList(struct Player *list) {
   ///@brief Counts how many states have been found at states.txt and searches it
   int state_count = 0;
 
-  list = new (Player);
+  list = new Player;
   list->next_player = NULL;
 
   while (!feof(usa)) {
-    aux_list = new (Player);
+    aux_list = new Player;
     aux_list->next_player = NULL;
     fread(&aux_list->name, sizeof(aux_list->name), 1, usa);
     aux_list->name[strlen(aux_list->name) - 10] = '\0';
-    ++state_count;
-    if (!feof(usa) && StateExists(list_states, state_count)) {
-      aux_list->move = rand() % kNumberMoves + 1;
+    if (!feof(usa) && StateExists(list_states, state_count, kNumberOpponents)) {
+      aux_list->move = rand() % kNumberMoves;
       aux_list->next_player = list;
       list = aux_list;
     }
+    ++state_count;
   }
   fclose(usa);
   return list;
@@ -171,23 +175,23 @@ int PlayerInput() {
     switch (player_move) {
       case 'r': case 'R': {
         printf("You've played ROCK.");
-        return 1;
+        return 0;
       }
       case 'p': case 'P': {
         printf("You've played PAPER.");
-        return 2;
+        return 1;
       }
       case 's': case 'S': {
         printf("You've played SCISSORS.");
-        return 3;
+        return 2;
       }
       case 'l': case 'L': {
         printf("You've played LIZARD.");
-        return 4;
+        return 3;
       }
       case 'k': case 'K': {
         printf("You've played SPOCK.");
-        return 5;
+        return 4;
       }
       default: {
         break;
@@ -196,207 +200,26 @@ int PlayerInput() {
   }
 }
 
-/**@brief Determine match's winner
-
-  This function compares both players' move and determine who wins,
-  loses or tie, returning a number with the resolution.
-  1 - Human player wins
-  2 - Draw
-  3 - Computer player wins
-
-  @return value Result of the match.
-  @param player_move As it says, user's move.
-  @param computer_move As it says, computer's move.
-*/
-int DetermineMatchWinner(int player_move, int computer_move) {
-  switch (player_move) {
-    case 1: { switch (computer_move) {
-                case 1: { //Rock vs Rock
-                  printf("\nIt's a draw!");
-                  return 2;
-                }
-                case 2: { //Rock vs Paper
-                  printf("\nPAPER covers ROCK.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 3: { //Rock vs Scissors
-                  printf("\nROCK crushes SCISSORS.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 4: { //Rock vs Lizard
-                  printf("\nROCK crushes LIZARD.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 5: { //Rock vs Spock
-                  printf("\nSPOCK vaporizes ROCK.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                default: { //Unknown value
-                  printf("\nComputer's move not recognised.");
-                  return 4;
-                }
-              }
-              break;
-    }
-    case 2: { switch (computer_move) {
-                case 1: { //Paper vs Rock
-                  printf("\nPAPER covers ROCK.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 2: { //Paper vs Paper
-                  printf("\nIt's a draw!");
-                  return 2;
-                }
-                case 3: { //Paper vs Scissors
-                  printf("\nSCISSORS cut PAPER.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 4: { //Paper vs Lizard
-                  printf("\nLIZARD eats PAPER.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 5: { //Paper vs Spock
-                  printf("\nPAPER disproves SPOCK.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                default: { //Unknown value
-                  printf("\nComputer's move not recognised.");
-                  return 4;
-                }
-              }
-              break;
-    }
-    case 3: { switch (computer_move) {
-                case 1: { //Scissors vs Rock
-                  printf("\nROCK crushes SCISSORS.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 2: { //Scissors vs Paper
-                  printf("\nSCISSORS cut PAPER.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 3: { //Scissors vs Scissors
-                  printf("\nIt's a draw!");
-                  return 2;
-                }
-                case 4: { //Scissors vs Lizard
-                  printf("\nSCISSORS decapitate LIZARD.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 5: { //Scissors vs Spock
-                  printf("\SPOCK smashes SCISSORS.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                default: { //Unknown value
-                  printf("\nComputer's move not recognised.");
-                  return 4;
-                }
-              }
-              break;
-    }
-    case 4: { switch (computer_move) {
-                case 1: { //Lizard vs Rock
-                  printf("\nROCK crushes LIZARD.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 2: { //Lizard vs Paper
-                  printf("\nLIZARD eats PAPER.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 3: { //Lizard vs Scissors
-                  printf("\nSCISSORS decapitate LIZARD.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 4: { //Lizard vs Lizard
-                  printf("\nIt's a draw!");
-                  return 2;
-                }
-                case 5: { //Lizard vs Spock
-                  printf("\nLIZARD poisons SPOCK.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                default: {
-                  printf("\nComputer's move not recognised.");
-                  return 4;
-                }
-              }
-              break;
-    }
-    case 5: { switch (computer_move) {
-                case 1: { //Spock vs Rock
-                  printf("\nSPOCK vaporizes ROCK.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 2: { //Spock vs Paper
-                  printf("\nPAPER disproves SPOCK.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 3: { //Spock vs Scissors
-                  printf("\nSPOCK smashes SCISSORS.");
-                  printf("\nYou win!");
-                  return 1;
-                }
-                case 4: { //Spock vs Lizard
-                  printf("\nLIZARD poisons SPOCK.");
-                  printf("\nYou lose!");
-                  return 3;
-                }
-                case 5: { //Spock vs Spock
-                  printf("\nIt's a drwa!");
-                  return 2;
-                }
-                default: {
-                  printf("\nComputer's move not recognised.");
-                  return 4;
-                }
-              }
-              break;
-    }
-    default: { //Unknown value
-      printf("\nPlayer's move not recognised");
-      return 4;
-    }
-  }
-}
-
 ///@brief Shows the move done by the CPU
 void ComputerMoveMessage(struct Player *computer) {
   switch (computer->move) {
-    case 1: {
+    case 0: {
       printf("\n%s plays ROCK", computer->name);
       break;
     }
-    case 2: {
+    case 1: {
       printf("\n%s plays PAPER", computer->name);
       break;
     }
-    case 3: {
+    case 2: {
       printf("\n%s plays SCISSORS", computer->name);
       break;
     }
-    case 4: {
+    case 3: {
       printf("\n%s plays LIZARD", computer->name);
       break;
     }
-    case 5: {
+    case 4: {
       printf("\n%s plays SPOCK", computer->name);
       break;
     }
@@ -409,19 +232,19 @@ void ComputerMoveMessage(struct Player *computer) {
 
 ///@brief Shows move represented at the value
 void ShowComputerMove(int num) {
-  if (num == 1) {
+  if (num == 0) {
     printf("ROCK      ");
   }
-  if (num == 2) {
+  if (num == 1) {
     printf("PAPER     ");
   }
-  if (num == 3) {
+  if (num == 2) {
     printf("SCISSORS  ");
   }
-  if (num == 4) {
+  if (num == 3) {
     printf("LIZARD    ");
   }
-  if (num == 5) {
+  if (num == 4) {
     printf("SPOCK     ");
   }
 }
@@ -454,20 +277,20 @@ int GameStart(int score, struct Player human, struct Player *enemies) {
       printf("\nROUND %d: vs %s", round_count, aux_enemies->name);
       human.move = PlayerInput();
       ComputerMoveMessage(aux_enemies);
-      switch (DetermineMatchWinner(human.move, aux_enemies->move)) {
+      switch (tableresults[human.move][aux_enemies->move]) {
         case 1: { //Game won
-          score = score + 2;
-          printf("\nYou've won 2 points. Total: %d\n", score);
+          score = score + kVictoryPoints;
+          printf("\nYou've won %d points. Total: %d\n", kVictoryPoints, score);
           break;
         }
         case 2: { //Tie
-          ++score;
-          printf("\nYou've won 1 point. Total: %d\n", score);
+          score = score + kTiePoints;
+          printf("\nYou've won %d point. Total: %d\n", kTiePoints, score);
           break;
         }
         case 3: { //Game lost
           game_ended = true;
-          printf(" GAME OVER.");
+          printf("\n -GAME OVER-.");
           printf("\n\nPress any button to see any remaining players:\n");
           break;
         }
@@ -502,11 +325,11 @@ int GameStart(int score, struct Player human, struct Player *enemies) {
   @param score User's score
   @param human Saves user's data and moves
 */
-void AddScore(int score, struct Player human) {
-  FILE *points = fopen("scores.txt", "a");
-  fputs(human.name, points);
-  fprintf(points, " %2d \n", score);
-  fclose(points);
+void SaveScore(int score, struct Player human, char* name_file) {
+  FILE *file = fopen(name_file, "a");
+  fputs(human.name, file);
+  fprintf(file, " %3d \n", score);
+  fclose(file);
 }
 
 int main()
@@ -520,25 +343,26 @@ int main()
   ///@brief As it says, the score of the game
   int score = 0;
 
-  if (!FileExists()) {
+  if (!FileExists("states.txt")) {
     printf("File -states.txt- not found.");
     _getch();
     return 1;
   }
-  printf("--------------------------------------\n");
-  printf(" Alex Kidd & Sheldon Cooper presents: \n");
-  printf("   ROCK-PAPER-SCISSORS-LIZARD-SPOCK   \n");
-  printf("--------------------------------------\n");
-  printf("         by Sergio Ruiz Roig          \n");
-  printf("\nPush any button to start the game.\n");
-  _getch();
+  GameLogo();
   human = InputName(human);
   GetComputerStates();
   computer = GetMatchList(computer);
   score = GameStart(score, human, computer);
-  AddScore(score, human);
+  SaveScore(score, human, "scores.txt");
   printf("\n\nFinal score: %d", score);
   _getch();
   return 0;
 }
                                                                                 
+  ////// COSAS POR HACER /////////////////////////////////////////////////////
+  /// -> Modo para poder seleccionar nº de jugadores                       ///
+  /// -> Cambiar InputName de devolver struct al char (cadena)             ///
+  /// -> Añadir parámetro de longitud de la array a StateExists            ///
+  /// -> Ajustar cadenas para que tengan a posteriori 1 sólo espacio       ///
+  /// -> Buscar memset()                                                   ///
+  ////////////////////////////////////////////////////////////////////////////         
