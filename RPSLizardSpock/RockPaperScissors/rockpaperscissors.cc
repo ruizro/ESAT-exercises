@@ -358,11 +358,4 @@ int main()
   _getch();
   return 0;
 }
-                                                                                
-  ////// COSAS POR HACER /////////////////////////////////////////////////////
-  /// -> Modo para poder seleccionar nº de jugadores                       ///
-  /// -> Cambiar InputName de devolver struct al char (cadena)             ///
-  /// -> Añadir parámetro de longitud de la array a StateExists            ///
-  /// -> Ajustar cadenas para que tengan a posteriori 1 sólo espacio       ///
-  /// -> Buscar memset()                                                   ///
-  ////////////////////////////////////////////////////////////////////////////         
+                                                                               
